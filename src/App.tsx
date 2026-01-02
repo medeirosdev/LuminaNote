@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Layout, Sidebar } from './components/layout';
-import { DashboardPage, TasksPage, ProjectsPage, FocusPage } from './pages';
+import { DashboardPage, TasksPage, ProjectsPage, FocusPage, CalendarPage } from './pages';
 import type { NavItem } from './types';
 
 function App() {
@@ -18,6 +18,8 @@ function App() {
         return <ProjectsPage />;
       case 'focus':
         return <FocusPage />;
+      case 'calendar':
+        return <CalendarPage />;
       default:
         return <DashboardPage />;
     }

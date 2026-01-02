@@ -4,6 +4,7 @@ import {
     CheckSquare,
     FolderKanban,
     Timer,
+    Calendar,
     ChevronLeft,
     ChevronRight,
     Sparkles,
@@ -24,6 +25,7 @@ const navItems: { id: NavItem; label: string; icon: React.ComponentType<{ size?:
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'tasks', label: 'Tasks', icon: CheckSquare },
     { id: 'projects', label: 'Projects', icon: FolderKanban },
+    { id: 'calendar', label: 'Calendar', icon: Calendar },
     { id: 'focus', label: 'Focus', icon: Timer },
 ];
 
