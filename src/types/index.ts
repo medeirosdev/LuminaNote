@@ -123,4 +123,23 @@ export interface TimerState {
 // =============================================================================
 
 /** Available navigation destinations in the app */
-export type NavItem = 'dashboard' | 'tasks' | 'projects' | 'focus';
+export type NavItem = 'dashboard' | 'tasks' | 'projects' | 'focus' | 'calendar';
+
+// =============================================================================
+// VIEW MODE TYPES
+// =============================================================================
+
+/** Available view modes for the tasks page */
+export type TaskViewMode = 'list' | 'kanban' | 'calendar';
+
+/** Filter state for advanced task filtering */
+export interface TaskFilterState {
+    /** Filter by project ID, null for all projects */
+    project: string | null;
+
+    /** Filter by priority level, null for all priorities */
+    priority: Task['priority'] | null;
+
+    /** Filter by date range */
+    dateRange: 'all' | 'overdue' | 'today' | 'week' | 'no-date';
+}
