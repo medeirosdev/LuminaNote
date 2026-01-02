@@ -1,6 +1,6 @@
 # LuminaNote
 
-A calm, minimalist personal productivity dashboard focused on mental clarity. Built with React, TypeScript, and Tailwind CSS.
+A simple, clean, and lightweight personal productivity dashboard. Built with React, TypeScript, and Tailwind CSS.
 
 ![LuminaNote Dashboard](https://via.placeholder.com/800x450?text=LuminaNote+Dashboard)
 
@@ -20,8 +20,8 @@ A calm, minimalist personal productivity dashboard focused on mental clarity. Bu
 - **LocalStorage** - Data persists across sessions
 
 ### Design Philosophy
-- Extreme minimalism with generous whitespace
-- Calm, pastel color palette (off-white, slate, sage)
+- Simple and clean interface
+- Lightweight and fast
 - Smooth animations powered by Framer Motion
 - Inter font for clean typography
 
@@ -176,6 +176,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Framer Motion](https://www.framer.com/motion/) for smooth animations
 - [Tailwind CSS](https://tailwindcss.com/) for utility-first styling
 - [Inter Font](https://fonts.google.com/specimen/Inter) for typography
+
+---
+
+## Author
+
+Created with care by **Guilherme de Medeiros**
+
+Software Engineer | Computational and Applied Mathematics @ UNICAMP | Undergraduate Researcher @ Recod.ai
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/guilhermedemedeiros/)
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/medeirosdev)
 
 ---
 
