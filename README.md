@@ -2,7 +2,12 @@
 
 A simple, clean, and lightweight personal productivity dashboard. Built with React, TypeScript, and Tailwind CSS.
 
-![LuminaNote Dashboard](https://via.placeholder.com/800x450?text=LuminaNote+Dashboard)
+## Screenshots
+
+| Dark Mode | Light Mode |
+|:---------:|:----------:|
+| ![Screenshot 1](assets/wall1.png) | ![Screenshot Light](assets/wall3lightmode.png) |
+| ![Screenshot 2](assets/wall2.png) | ![Screenshot 3](assets/wall3.png) |
 
 ## Features
 
