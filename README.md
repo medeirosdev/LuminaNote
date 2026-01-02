@@ -94,20 +94,37 @@ src/
 └── index.css           # Tailwind + theme tokens
 ```
 
-## Desktop App (Optional)
+## Desktop App (Electron)
 
-LuminaNote is designed to be easily packaged as a desktop application:
+LuminaNote can be run as a native desktop application using Electron.
 
-### Electron
+### Development Mode
+
+Run the app in a desktop window with hot reload:
+
 ```bash
-npm install electron electron-builder --save-dev
-# Add electron configuration
+npm run electron:dev
 ```
 
-### Tauri
-```bash
-npm create tauri-app
-# Follow Tauri setup instructions
+### Build Installers
+
+Generate platform-specific installers:
+
+| Command | Output |
+|---------|--------|
+| `npm run electron:build:win` | Windows `.exe` installer |
+| `npm run electron:build:mac` | macOS `.dmg` installer |
+| `npm run electron:build:linux` | Linux `.AppImage` |
+| `npm run electron:build` | Build for current platform |
+
+The installers will be created in the `release/` folder.
+
+### Project Structure (Electron)
+
+```
+electron/
+├── main.cjs      # Main process (window creation)
+└── preload.cjs   # Secure bridge to renderer
 ```
 
 ## Customization
