@@ -1,0 +1,60 @@
+{
+  "name": "luminanote",
+  "version": "1.0.0",
+  "description": "A calm, minimalist personal productivity dashboard focused on mental clarity. Manage tasks, projects, and focus sessions with a zen-like interface.",
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "keywords": [
+    "productivity",
+    "task-manager",
+    "pomodoro",
+    "dashboard",
+    "react",
+    "typescript",
+    "tailwindcss",
+    "framer-motion",
+    "electron-ready",
+    "tauri-ready"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/medeirosdev/LuminaNote.git"
+  },
+  "homepage": "https://github.com/medeirosdev/LuminaNote#readme",
+  "bugs": {
+    "url": "https://github.com/medeirosdev/LuminaNote/issues"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "framer-motion": "^12.23.26",
+    "lucide-react": "^0.562.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@tailwindcss/vite": "^4.1.18",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.1.1",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "tailwindcss": "^4.1.18",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vite": "^7.2.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
