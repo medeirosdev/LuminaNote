@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+/* LuminaNote - Theme Design Tokens */
+@theme {
+  /* Light Theme Colors */
+  --color-zen-bg: #FAFAF9;
+  --color-zen-surface: #F5F5F4;
+  --color-zen-card: #FFFFFF;
+  --color-zen-text: #1C1917;
+  --color-zen-text-secondary: #78716C;
+  --color-zen-text-muted: #A8A29E;
+  --color-zen-border: #E7E5E4;
+  --color-zen-border-light: #F0EFED;
+
+  /* Accent Colors */
+  --color-zen-accent: #64748B;
+  --color-zen-accent-light: #94A3B8;
+  --color-zen-sage: #84A98C;
+  --color-zen-sage-light: #A7C4AB;
+
+  /* Priority Colors */
+  --color-priority-low: #84A98C;
+  --color-priority-medium: #F59E0B;
+  --color-priority-high: #EF4444;
+
+  /* Shadows */
+  --shadow-zen-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+  --shadow-zen-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.03);
+  --shadow-zen-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.03);
+
+  /* Border Radius */
+  --radius-zen: 12px;
+  --radius-zen-lg: 16px;
+  --radius-zen-xl: 24px;
+
+  /* Transitions */
+  --transition-zen: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Theme Override */
+.dark {
+  --color-zen-bg: #0F0F0F;
+  --color-zen-surface: #1A1A1A;
+  --color-zen-card: #242424;
+  --color-zen-text: #FAFAFA;
+  --color-zen-text-secondary: #A1A1AA;
+  --color-zen-text-muted: #71717A;
+  --color-zen-border: #2E2E2E;
+  --color-zen-border-light: #262626;
+
+  /* Accent Colors - slightly brighter for dark mode */
+  --color-zen-accent: #818CF8;
+  --color-zen-accent-light: #A5B4FC;
+  --color-zen-sage: #86EFAC;
+  --color-zen-sage-light: #BBF7D0;
+
+  /* Dark mode shadows */
+  --shadow-zen-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-zen-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+  --shadow-zen-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--color-zen-bg);
+  color: var(--color-zen-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-zen-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-zen-text-muted);
+}
+
+/* Focus Styles */
+:focus-visible {
+  outline: 2px solid var(--color-zen-accent);
+  outline-offset: 2px;
+}
+
+/* Toast Animations */
+@keyframes toast-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-slide-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.toast-enter {
+  animation: toast-slide-in 0.3s ease-out;
+}
+
+.toast-exit {
+  animation: toast-slide-out 0.3s ease-in;
+}
