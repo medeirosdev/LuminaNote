@@ -1,14 +1,17 @@
 /**
- * @fileoverview Task management hook with CRUD operations
+ * @fileoverview Task management hook with SQLite and localStorage support
  * 
  * Provides all task-related functionality including creating, updating,
- * deleting, and reordering tasks. Persists to localStorage automatically.
+ * deleting, and reordering tasks. Uses SQLite when available, falls back to localStorage.
  * 
  * @module hooks/useTasks
  */
 
-import { useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useLocalStorage } from './useLocalStorage';
+import { useDatabase } from './useDatabase';
+import { isDatabaseInitialized } from '../services/database';
+import * as taskRepo from '../services/taskRepository';
 import type { Task } from '../types';
 
 /**
@@ -20,30 +23,53 @@ const generateId = () => `task_${Date.now()}_${Math.random().toString(36).substr
 /**
  * Hook for managing the task state in the application.
  * Handles CRUD operations, filtering, and drag-and-drop reordering.
+ * Uses SQLite when database is ready, falls back to localStorage.
  * 
  * @returns Object containing tasks and all management functions
- * 
- * @example
- * ```tsx
- * const { todayTasks, addTask, toggleTask, deleteTask } = useTasks();
- * 
- * // Add a new task
- * addTask('Review PR', 'today', { priority: 'high', dueDate: '2026-01-05' });
- * 
- * // Mark task as complete
- * toggleTask(taskId);
- * ```
  */
 export function useTasks() {
-    const [tasks, setTasks] = useLocalStorage<Task[]>('lumina-tasks', []);
+    const { isReady: dbReady } = useDatabase();
+    const [localTasks, setLocalTasks] = useLocalStorage<Task[]>('lumina-tasks', []);
+    const [dbTasks, setDbTasks] = useState<Task[]>([]);
+    const [useDb, setUseDb] = useState(false);
+
+    // Load from SQLite when database is ready
+    useEffect(() => {
+        if (dbReady && isDatabaseInitialized()) {
+            try {
+                const tasks = taskRepo.getAllTasks();
+                if (tasks.length > 0) {
+                    // Database has data, use it
+                    setDbTasks(tasks);
+                    setUseDb(true);
+                } else if (localTasks.length > 0) {
+                    // Migrate localStorage data to SQLite
+                    localTasks.forEach(task => {
+                        taskRepo.insertTask(task);
+                    });
+                    setDbTasks(localTasks);
+                    setUseDb(true);
+                    console.log('[useTasks] Migrated localStorage data to SQLite');
+                } else {
+                    setUseDb(true);
+                }
+            } catch (error) {
+                console.error('[useTasks] SQLite error, using localStorage:', error);
+                setUseDb(false);
+            }
+        }
+    }, [dbReady, localTasks]);
+
+    // Current tasks (either from DB or localStorage)
+    const tasks = useDb ? dbTasks : localTasks;
+    const setTasks = useDb
+        ? (updater: Task[] | ((prev: Task[]) => Task[])) => {
+            setDbTasks(typeof updater === 'function' ? updater(dbTasks) : updater);
+        }
+        : setLocalTasks;
 
     /**
      * Creates a new task with the given parameters.
-     * 
-     * @param title - The task title
-     * @param category - Time-based category (today, week, backlog)
-     * @param options - Optional priority, projectId, and dueDate
-     * @returns The newly created task
      */
     const addTask = useCallback((
         title: string,
@@ -65,51 +91,79 @@ export function useTasks() {
             dueDate: options?.dueDate,
             order: tasks.filter(t => t.category === category).length,
         };
-        setTasks((prev) => [...prev, newTask]);
+
+        if (useDb) {
+            try {
+                taskRepo.insertTask(newTask);
+            } catch (error) {
+                console.error('[useTasks] Failed to insert task:', error);
+            }
+        }
+
+        setTasks((prev: Task[]) => [...prev, newTask]);
         return newTask;
-    }, [setTasks, tasks]);
+    }, [setTasks, tasks, useDb]);
 
     /**
      * Toggles the completed status of a task.
-     * 
-     * @param id - The task ID to toggle
      */
     const toggleTask = useCallback((id: string) => {
-        setTasks((prev) =>
+        if (useDb) {
+            try {
+                taskRepo.toggleTask(id);
+            } catch (error) {
+                console.error('[useTasks] Failed to toggle task:', error);
+            }
+        }
+
+        setTasks((prev: Task[]) =>
             prev.map((task) =>
                 task.id === id ? { ...task, completed: !task.completed } : task
             )
         );
-    }, [setTasks]);
+    }, [setTasks, useDb]);
 
     /**
      * Permanently deletes a task.
-     * 
-     * @param id - The task ID to delete
      */
     const deleteTask = useCallback((id: string) => {
-        setTasks((prev) => prev.filter((task) => task.id !== id));
-    }, [setTasks]);
+        if (useDb) {
+            try {
+                taskRepo.deleteTask(id);
+            } catch (error) {
+                console.error('[useTasks] Failed to delete task:', error);
+            }
+        }
+
+        setTasks((prev: Task[]) => prev.filter((task) => task.id !== id));
+    }, [setTasks, useDb]);
 
     /**
      * Updates specific fields of a task.
-     * 
-     * @param id - The task ID to update
-     * @param updates - Partial task object with fields to update
      */
     const updateTask = useCallback((id: string, updates: Partial<Task>) => {
-        setTasks((prev) =>
-            prev.map((task) =>
+        setTasks((prev: Task[]) => {
+            const updated = prev.map((task) =>
                 task.id === id ? { ...task, ...updates } : task
-            )
-        );
-    }, [setTasks]);
+            );
+
+            if (useDb) {
+                const updatedTask = updated.find(t => t.id === id);
+                if (updatedTask) {
+                    try {
+                        taskRepo.updateTask(updatedTask);
+                    } catch (error) {
+                        console.error('[useTasks] Failed to update task:', error);
+                    }
+                }
+            }
+
+            return updated;
+        });
+    }, [setTasks, useDb]);
 
     /**
      * Gets all tasks for a specific category, sorted by order.
-     * 
-     * @param category - The category to filter by
-     * @returns Sorted array of tasks in the category
      */
     const getTasksByCategory = useCallback((category: Task['category']) => {
         return tasks
@@ -119,9 +173,6 @@ export function useTasks() {
 
     /**
      * Gets all tasks associated with a project.
-     * 
-     * @param projectId - The project ID to filter by
-     * @returns Array of tasks linked to the project
      */
     const getTasksByProject = useCallback((projectId: string) => {
         return tasks.filter((task) => task.projectId === projectId);
@@ -129,9 +180,6 @@ export function useTasks() {
 
     /**
      * Links or unlinks a task to/from a project.
-     * 
-     * @param taskId - The task ID to update
-     * @param projectId - The project ID (undefined to unlink)
      */
     const linkTaskToProject = useCallback((taskId: string, projectId: string | undefined) => {
         updateTask(taskId, { projectId });
@@ -139,13 +187,18 @@ export function useTasks() {
 
     /**
      * Updates the order of tasks after drag-and-drop reordering.
-     * Only affects tasks in the specified category.
-     * 
-     * @param category - The category being reordered
-     * @param reorderedTasks - New order of tasks
      */
     const reorderTasks = useCallback((category: Task['category'], reorderedTasks: Task[]) => {
-        setTasks((prev) => {
+        if (useDb) {
+            const orderedIds = reorderedTasks.map(t => t.id);
+            try {
+                taskRepo.updateTaskOrder(category, orderedIds);
+            } catch (error) {
+                console.error('[useTasks] Failed to reorder tasks:', error);
+            }
+        }
+
+        setTasks((prev: Task[]) => {
             const otherTasks = prev.filter(t => t.category !== category);
             const orderedTasks = reorderedTasks.map((task, index) => ({
                 ...task,
@@ -153,7 +206,7 @@ export function useTasks() {
             }));
             return [...otherTasks, ...orderedTasks];
         });
-    }, [setTasks]);
+    }, [setTasks, useDb]);
 
     // Pre-filtered and sorted task lists for convenience
     const todayTasks = tasks.filter((t) => t.category === 'today').sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -173,5 +226,6 @@ export function useTasks() {
         todayTasks,
         weekTasks,
         backlogTasks,
+        isUsingSQLite: useDb,
     };
 }

@@ -4,13 +4,16 @@ import './index.css'
 import App from './App.tsx'
 import { ThemeProvider } from './hooks/useTheme.tsx'
 import { ToastProvider } from './hooks/useToast.tsx'
+import { DatabaseProvider } from './hooks/useDatabase.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeProvider>
-      <ToastProvider>
-        <App />
-      </ToastProvider>
-    </ThemeProvider>
+    <DatabaseProvider>
+      <ThemeProvider>
+        <ToastProvider>
+          <App />
+        </ToastProvider>
+      </ThemeProvider>
+    </DatabaseProvider>
   </StrictMode>,
 )
