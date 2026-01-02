@@ -32,6 +32,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
+    "generate-icons": "electron-icon-builder --input=./public/icon.png --output=./build/icons",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
     "electron:build": "npm run build && electron-builder",
     "electron:build:win": "npm run build && electron-builder --win",
@@ -50,7 +51,7 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "public/icon.png",
+      "icon": "public/icon.ico",
       "forceCodeSigning": false
     },
     "mac": {
@@ -85,6 +86,7 @@
     "concurrently": "^9.2.1",
     "electron": "^39.2.7",
     "electron-builder": "^26.0.12",
+    "electron-icon-builder": "^2.0.1",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
