@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { TaskCard } from './TaskCard';
 import { TaskInput } from './TaskInput';
@@ -36,9 +36,9 @@ export function TaskList({
     const totalCount = tasks.length;
 
     // Update local state when props change
-    if (JSON.stringify(tasks.map(t => t.id)) !== JSON.stringify(orderedTasks.map(t => t.id))) {
+    useEffect(() => {
         setOrderedTasks(tasks);
-    }
+    }, [tasks]);
 
     const handleReorder = useCallback((newOrder: Task[]) => {
         setOrderedTasks(newOrder);
