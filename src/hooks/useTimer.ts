@@ -46,6 +46,7 @@ export function useTimer() {
     // Persist timer state to localStorage
     const [timerState, setTimerState] = useLocalStorage<TimerState>('zen-timer', {
         duration: FOCUS_DURATION,
+        focusDuration: FOCUS_DURATION,
         remaining: FOCUS_DURATION,
         isRunning: false,
         sessions: 0,
@@ -75,7 +76,8 @@ export function useTimer() {
                 }
 
                 const newMode = timerState.mode === 'focus' ? 'break' : 'focus';
-                const newDuration = newMode === 'focus' ? FOCUS_DURATION : BREAK_DURATION;
+                const focusDur = timerState.focusDuration || FOCUS_DURATION;
+                const newDuration = newMode === 'focus' ? focusDur : BREAK_DURATION;
                 const newSessions = timerState.mode === 'focus' ? timerState.sessions + 1 : timerState.sessions;
 
                 setTimerState({
@@ -90,7 +92,7 @@ export function useTimer() {
             }
             return prev - 1;
         });
-    }, [timerState.mode, timerState.sessions, setTimerState]);
+    }, [timerState.mode, timerState.sessions, timerState.focusDuration, setTimerState]);
 
     /**
      * Starts the timer countdown.
@@ -121,7 +123,8 @@ export function useTimer() {
             clearInterval(intervalRef.current);
             intervalRef.current = null;
         }
-        const duration = timerState.mode === 'focus' ? FOCUS_DURATION : BREAK_DURATION;
+        const focusDur = timerState.focusDuration || FOCUS_DURATION;
+        const duration = timerState.mode === 'focus' ? focusDur : BREAK_DURATION;
         setLocalRemaining(duration);
         setTimerState((prev) => ({
             ...prev,
@@ -129,7 +132,7 @@ export function useTimer() {
             remaining: duration,
             isRunning: false,
         }));
-    }, [timerState.mode, setTimerState]);
+    }, [timerState.mode, timerState.focusDuration, setTimerState]);
 
     /**
      * Skips to the next session (focus -> break or break -> focus).
@@ -140,7 +143,8 @@ export function useTimer() {
             intervalRef.current = null;
         }
         const newMode = timerState.mode === 'focus' ? 'break' : 'focus';
-        const newDuration = newMode === 'focus' ? FOCUS_DURATION : BREAK_DURATION;
+        const focusDur = timerState.focusDuration || FOCUS_DURATION;
+        const newDuration = newMode === 'focus' ? focusDur : BREAK_DURATION;
         setLocalRemaining(newDuration);
         setTimerState({
             duration: newDuration,
@@ -150,6 +154,28 @@ export function useTimer() {
             mode: newMode,
         });
     }, [timerState.mode, timerState.sessions, setTimerState]);
+
+    /**
+     * Sets a custom focus duration in minutes and resets the timer.
+     */
+    const setCustomDuration = useCallback((minutes: number) => {
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        }
+
+        const newDuration = minutes * 60;
+        setLocalRemaining(newDuration);
+
+        setTimerState((prev) => ({
+            ...prev,
+            duration: newDuration,
+            focusDuration: newDuration,
+            remaining: newDuration,
+            isRunning: false,
+            mode: 'focus',
+        }));
+    }, [setTimerState]);
 
     // Cleanup interval on unmount
     useEffect(() => {
@@ -188,5 +214,6 @@ export function useTimer() {
         pause,
         reset,
         skipToNext,
+        setCustomDuration,
     };
 }

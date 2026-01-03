@@ -105,6 +105,9 @@ export interface TimerState {
     /** Total duration in seconds */
     duration: number;
 
+    /** Configured focus duration in seconds (default 25 * 60) */
+    focusDuration?: number;
+
     /** Remaining time in seconds */
     remaining: number;
 

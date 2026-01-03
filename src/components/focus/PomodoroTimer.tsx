@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Pause, RotateCcw, SkipForward, Coffee } from 'lucide-react';
+import { Play, Pause, RotateCcw, SkipForward, Coffee, Edit2 } from 'lucide-react';
 import { useTimer } from '../../hooks/useTimer';
 
 export function PomodoroTimer() {
@@ -13,7 +14,34 @@ export function PomodoroTimer() {
         pause,
         reset,
         skipToNext,
+        setCustomDuration,
     } = useTimer();
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [inputValue, setInputValue] = useState('');
+
+    const handleTimeClick = () => {
+        if (!isRunning && mode === 'focus') {
+            setIsEditing(true);
+        }
+    };
+
+    const handleInputBlur = () => {
+        setIsEditing(false);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            const mins = parseInt(inputValue);
+            if (!isNaN(mins) && mins > 0) {
+                setCustomDuration(mins);
+            }
+            setIsEditing(false);
+            setInputValue('');
+        } else if (e.key === 'Escape') {
+            setIsEditing(false);
+        }
+    };
 
     const circumference = 2 * Math.PI * 90; // radius = 90
     const strokeDashoffset = circumference - (progress / 100) * circumference;
@@ -23,8 +51,8 @@ export function PomodoroTimer() {
             {/* Mode Indicator */}
             <div className="flex items-center gap-2 text-sm">
                 <span className={`px-3 py-1 rounded-full ${mode === 'focus'
-                        ? 'bg-zen-accent/10 text-zen-accent'
-                        : 'bg-zen-sage/10 text-zen-sage'
+                    ? 'bg-zen-accent/10 text-zen-accent'
+                    : 'bg-zen-sage/10 text-zen-sage'
                     }`}>
                     {mode === 'focus' ? 'Focus Time' : 'Break Time'}
                 </span>
@@ -66,17 +94,43 @@ export function PomodoroTimer() {
 
                 {/* Time Display */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <motion.span
-                        key={formattedTime}
-                        initial={{ scale: 1.1, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="text-4xl font-light text-zen-text tracking-wide"
-                    >
-                        {formattedTime}
-                    </motion.span>
-                    <span className="text-xs text-zen-text-muted mt-1">
-                        Session {sessions + 1}
-                    </span>
+                    {isEditing ? (
+                        <input
+                            autoFocus
+                            type="number"
+                            min="1"
+                            max="999"
+                            placeholder="min"
+                            className="w-24 text-4xl text-center bg-transparent border-b-2 border-zen-accent/50 text-zen-text focus:outline-none focus:border-zen-accent"
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            onBlur={handleInputBlur}
+                            onKeyDown={handleKeyDown}
+                        />
+                    ) : (
+                        <div
+                            className={`flex flex-col items-center justify-center ${!isRunning && mode === 'focus' ? 'cursor-pointer group' : ''}`}
+                            onClick={handleTimeClick}
+                            title={!isRunning && mode === 'focus' ? "Click to set custom time" : ""}
+                        >
+                            <div className="flex items-center gap-2">
+                                <motion.span
+                                    key={formattedTime}
+                                    initial={{ scale: 1.1, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    className="text-4xl font-light text-zen-text tracking-wide"
+                                >
+                                    {formattedTime}
+                                </motion.span>
+                                {!isRunning && mode === 'focus' && (
+                                    <Edit2 size={16} className="text-zen-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+                                )}
+                            </div>
+                            <span className="text-xs text-zen-text-muted mt-1">
+                                Session {sessions + 1}
+                            </span>
+                        </div>
+                    )}
                 </div>
             </div>
 
