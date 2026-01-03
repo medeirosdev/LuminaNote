@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import iconImg from '../../assets/icon.png';
 
 interface SplashScreenProps {
     onComplete: () => void;
@@ -25,7 +26,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         >
             {/* Logo */}
             <motion.img
-                src="/icon.png"
+                src={iconImg}
                 alt="LuminaNote"
                 className="w-28 h-28 mb-6"
                 initial={{ opacity: 0, scale: 0.8 }}
