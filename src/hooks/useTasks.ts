@@ -68,6 +68,28 @@ export function useTasks() {
         }
         : setLocalTasks;
 
+    // Reset recurring tasks daily
+    useEffect(() => {
+        const today = new Date().toDateString();
+        const tasksToReset = tasks.filter(task => {
+            if (!task.isRecurring || !task.completed) return false;
+            if (!task.lastCompletedAt) return true;
+            const lastCompleted = new Date(task.lastCompletedAt).toDateString();
+            return lastCompleted !== today;
+        });
+
+        if (tasksToReset.length > 0) {
+            setTasks((prev: Task[]) =>
+                prev.map(task =>
+                    tasksToReset.find(t => t.id === task.id)
+                        ? { ...task, completed: false }
+                        : task
+                )
+            );
+            console.log('[useTasks] Reset', tasksToReset.length, 'recurring tasks');
+        }
+    }, [tasks, setTasks]);
+
     /**
      * Creates a new task with the given parameters.
      */
@@ -78,6 +100,8 @@ export function useTasks() {
             priority?: Task['priority'];
             projectId?: string;
             dueDate?: string;
+            dueTime?: string;
+            isRecurring?: boolean;
         }
     ) => {
         const newTask: Task = {
@@ -89,6 +113,8 @@ export function useTasks() {
             createdAt: new Date().toISOString(),
             projectId: options?.projectId,
             dueDate: options?.dueDate,
+            dueTime: options?.dueTime,
+            isRecurring: options?.isRecurring,
             order: tasks.filter(t => t.category === category).length,
         };
 
@@ -104,8 +130,10 @@ export function useTasks() {
         return newTask;
     }, [setTasks, tasks, useDb]);
 
+
     /**
      * Toggles the completed status of a task.
+     * For recurring tasks, also tracks lastCompletedAt timestamp.
      */
     const toggleTask = useCallback((id: string) => {
         if (useDb) {
@@ -117,9 +145,18 @@ export function useTasks() {
         }
 
         setTasks((prev: Task[]) =>
-            prev.map((task) =>
-                task.id === id ? { ...task, completed: !task.completed } : task
-            )
+            prev.map((task) => {
+                if (task.id !== id) return task;
+                const nowCompleted = !task.completed;
+                return {
+                    ...task,
+                    completed: nowCompleted,
+                    // Track when recurring tasks are completed
+                    lastCompletedAt: task.isRecurring && nowCompleted
+                        ? new Date().toISOString()
+                        : task.lastCompletedAt,
+                };
+            })
         );
     }, [setTasks, useDb]);
 

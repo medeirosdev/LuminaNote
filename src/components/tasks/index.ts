@@ -6,3 +6,6 @@ export { KanbanBoard } from './KanbanBoard';
 export { KanbanColumn } from './KanbanColumn';
 export { CalendarView } from './CalendarView';
 export { CalendarDay } from './CalendarDay';
+export { TaskModal, TaskEditModal } from './TaskModal';
+
+

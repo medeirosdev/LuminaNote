@@ -40,6 +40,15 @@ export interface Task {
     /** Optional due date in ISO format */
     dueDate?: string;
 
+    /** Optional due time in HH:MM format */
+    dueTime?: string;
+
+    /** Whether this is a daily recurring task */
+    isRecurring?: boolean;
+
+    /** ISO timestamp of when recurring task was last completed */
+    lastCompletedAt?: string;
+
     /** Order index for drag-and-drop sorting */
     order?: number;
 }
@@ -126,7 +135,7 @@ export interface TimerState {
 // =============================================================================
 
 /** Available navigation destinations in the app */
-export type NavItem = 'dashboard' | 'tasks' | 'projects' | 'focus' | 'calendar';
+export type NavItem = 'dashboard' | 'tasks' | 'projects' | 'focus' | 'calendar' | 'wheel';
 
 // =============================================================================
 // VIEW MODE TYPES
@@ -146,3 +155,20 @@ export interface TaskFilterState {
     /** Filter by date range */
     dateRange: 'all' | 'overdue' | 'today' | 'week' | 'no-date';
 }
+
+// =============================================================================
+// WHEEL TYPES
+// =============================================================================
+
+/** Represents an option in the random decision wheel */
+export interface WheelOption {
+    /** Unique identifier */
+    id: string;
+
+    /** Display label */
+    label: string;
+
+    /** Color for the wheel segment */
+    color: string;
+}
+

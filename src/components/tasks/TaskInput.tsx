@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Calendar } from 'lucide-react';
+import { Plus, Calendar, Clock, Repeat } from 'lucide-react';
 import type { Task } from '../../types';
 
 interface TaskInputProps {
@@ -9,12 +9,16 @@ interface TaskInputProps {
         priority?: Task['priority'];
         projectId?: string;
         dueDate?: string;
+        dueTime?: string;
+        isRecurring?: boolean;
     }) => void;
 }
 
 export function TaskInput({ category, onAdd }: TaskInputProps) {
     const [title, setTitle] = useState('');
     const [dueDate, setDueDate] = useState('');
+    const [dueTime, setDueTime] = useState('');
+    const [isRecurring, setIsRecurring] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -23,9 +27,13 @@ export function TaskInput({ category, onAdd }: TaskInputProps) {
             onAdd(title.trim(), category, {
                 priority: 'medium',
                 dueDate: dueDate || undefined,
+                dueTime: dueTime || undefined,
+                isRecurring: isRecurring || undefined,
             });
             setTitle('');
             setDueDate('');
+            setDueTime('');
+            setIsRecurring(false);
             setIsExpanded(false);
         }
     };
@@ -60,21 +68,46 @@ export function TaskInput({ category, onAdd }: TaskInputProps) {
                        transition-all duration-200"
                     />
 
-                    {/* Due Date Input */}
-                    <div className="flex items-center gap-2">
-                        <div className="flex-1 relative">
+                    {/* Date and Time Inputs */}
+                    <div className="flex flex-col sm:flex-row gap-2">
+                        <div className="flex-1 relative min-w-0">
                             <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zen-text-muted" />
                             <input
                                 type="date"
                                 value={dueDate}
                                 onChange={(e) => setDueDate(e.target.value)}
-                                className="w-full pl-9 pr-3 py-2 rounded-zen border border-zen-border bg-zen-card
+                                className="w-full pl-9 pr-2 py-2 rounded-zen border border-zen-border bg-zen-card
+                           text-sm text-zen-text
+                           focus:outline-none focus:border-zen-accent focus:ring-1 focus:ring-zen-accent/20
+                           transition-all duration-200"
+                            />
+                        </div>
+                        <div className="flex-1 relative min-w-0">
+                            <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zen-text-muted" />
+                            <input
+                                type="time"
+                                value={dueTime}
+                                onChange={(e) => setDueTime(e.target.value)}
+                                className="w-full pl-9 pr-2 py-2 rounded-zen border border-zen-border bg-zen-card
                            text-sm text-zen-text
                            focus:outline-none focus:border-zen-accent focus:ring-1 focus:ring-zen-accent/20
                            transition-all duration-200"
                             />
                         </div>
                     </div>
+
+                    {/* Recurring Toggle */}
+                    <button
+                        type="button"
+                        onClick={() => setIsRecurring(!isRecurring)}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-zen border text-sm transition-all duration-200 ${isRecurring
+                            ? 'border-zen-sage bg-zen-sage/10 text-zen-sage'
+                            : 'border-zen-border text-zen-text-muted hover:border-zen-accent/30'
+                            }`}
+                    >
+                        <Repeat size={14} />
+                        <span>Daily recurring</span>
+                    </button>
 
                     <div className="flex gap-2">
                         <button
@@ -92,6 +125,8 @@ export function TaskInput({ category, onAdd }: TaskInputProps) {
                                 setIsExpanded(false);
                                 setTitle('');
                                 setDueDate('');
+                                setDueTime('');
+                                setIsRecurring(false);
                             }}
                             className="py-2 px-3 rounded-zen text-zen-text-secondary text-sm
                          hover:bg-zen-surface transition-colors duration-200"
@@ -104,3 +139,4 @@ export function TaskInput({ category, onAdd }: TaskInputProps) {
         </motion.div>
     );
 }
+

@@ -10,7 +10,8 @@ import {
     ChevronRight,
     Sparkles,
     Sun,
-    Moon
+    Moon,
+    Dices
 } from 'lucide-react';
 import type { NavItem } from '../../types';
 import { useTheme } from '../../hooks/useTheme';
@@ -29,7 +30,9 @@ const navItems: { id: NavItem; label: string; icon: React.ComponentType<{ size?:
     { id: 'projects', label: 'Projects', icon: FolderKanban },
     { id: 'calendar', label: 'Calendar', icon: Calendar },
     { id: 'focus', label: 'Focus', icon: Timer },
+    { id: 'wheel', label: 'Wheel', icon: Dices },
 ];
+
 
 export function Sidebar({ activeNav, onNavChange, isCollapsed, onToggleCollapse }: SidebarProps) {
     const { theme, toggleTheme } = useTheme();

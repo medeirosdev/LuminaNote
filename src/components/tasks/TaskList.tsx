@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
+import { Plus } from 'lucide-react';
 import { TaskCard } from './TaskCard';
-import { TaskInput } from './TaskInput';
+import { TaskModal } from './TaskModal';
 import type { Task } from '../../types';
 
 interface TaskListProps {
@@ -12,9 +13,12 @@ interface TaskListProps {
         priority?: Task['priority'];
         projectId?: string;
         dueDate?: string;
+        dueTime?: string;
+        isRecurring?: boolean;
     }) => void;
     onToggle: (id: string) => void;
     onDelete: (id: string) => void;
+    onEdit?: (task: Task) => void;
     onReorder?: (tasks: Task[]) => void;
     showInput?: boolean;
     enableDragDrop?: boolean;
@@ -27,11 +31,13 @@ export function TaskList({
     onAdd,
     onToggle,
     onDelete,
+    onEdit,
     onReorder,
     showInput = true,
     enableDragDrop = false,
 }: TaskListProps) {
     const [orderedTasks, setOrderedTasks] = useState(tasks);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const completedCount = tasks.filter(t => t.completed).length;
     const totalCount = tasks.length;
 
@@ -75,6 +81,7 @@ export function TaskList({
                             task={task}
                             onToggle={onToggle}
                             onDelete={onDelete}
+                            onEdit={onEdit}
                             isDraggable={true}
                         />
                     ))}
@@ -88,6 +95,7 @@ export function TaskList({
                                 task={task}
                                 onToggle={onToggle}
                                 onDelete={onDelete}
+                                onEdit={onEdit}
                                 isDraggable={false}
                             />
                         ))}
@@ -105,10 +113,28 @@ export function TaskList({
                 </motion.div>
             )}
 
-            {/* Input */}
+            {/* Add Task Button */}
             {showInput && (
-                <TaskInput category={category} onAdd={onAdd} />
+                <button
+                    onClick={() => setIsAddModalOpen(true)}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 px-4
+                        rounded-zen border border-dashed border-zen-border
+                        text-sm text-zen-text-muted
+                        hover:border-zen-accent hover:text-zen-accent
+                        transition-all duration-200"
+                >
+                    <Plus size={16} />
+                    <span>Add task</span>
+                </button>
             )}
+
+            {/* Add Task Modal */}
+            <TaskModal
+                isOpen={isAddModalOpen}
+                category={category}
+                onClose={() => setIsAddModalOpen(false)}
+                onAdd={onAdd}
+            />
         </div>
     );
 }

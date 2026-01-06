@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { List, Columns, Filter as FilterIcon } from 'lucide-react';
-import { TaskList, TaskFilters, KanbanBoard } from '../components/tasks';
+import { TaskList, TaskFilters, KanbanBoard, TaskEditModal } from '../components/tasks';
 import { useTasks } from '../hooks/useTasks';
 import { useProjects } from '../hooks/useProjects';
 import { useTaskFilters } from '../hooks/useTaskFilters';
@@ -11,7 +11,7 @@ import type { Task } from '../types';
 type TasksViewMode = 'list' | 'kanban';
 
 export function TasksPage() {
-    const { tasks, todayTasks, weekTasks, backlogTasks, addTask, toggleTask, deleteTask, reorderTasks } = useTasks();
+    const { tasks, todayTasks, weekTasks, backlogTasks, addTask, toggleTask, deleteTask, updateTask, reorderTasks } = useTasks();
     const { projects } = useProjects();
     const { showToast } = useToast();
     const {
@@ -26,6 +26,10 @@ export function TasksPage() {
 
     const [viewMode, setViewMode] = useState<TasksViewMode>('list');
     const [showFilters, setShowFilters] = useState(false);
+
+    // Edit modal state
+    const [editingTask, setEditingTask] = useState<Task | null>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     // Apply filters to all task lists
     const filteredTodayTasks = applyFilters(todayTasks);
@@ -51,6 +55,16 @@ export function TasksPage() {
         showToast('Task deleted', 'info');
     };
 
+    const handleEditTask = (task: Task) => {
+        setEditingTask(task);
+        setIsEditModalOpen(true);
+    };
+
+    const handleSaveEdit = (id: string, updates: Partial<Task>) => {
+        updateTask(id, updates);
+        showToast('Task updated', 'success');
+    };
+
     const handleReorderToday = (tasks: Task[]) => {
         reorderTasks('today', tasks);
     };
@@ -62,6 +76,7 @@ export function TasksPage() {
     const handleReorderBacklog = (tasks: Task[]) => {
         reorderTasks('backlog', tasks);
     };
+
 
     const viewModes: { mode: TasksViewMode; icon: typeof List; label: string }[] = [
         { mode: 'list', icon: List, label: 'List' },
@@ -164,6 +179,7 @@ export function TasksPage() {
                                 onAdd={handleAddTask}
                                 onToggle={handleToggleTask}
                                 onDelete={handleDeleteTask}
+                                onEdit={handleEditTask}
                                 onReorder={handleReorderToday}
                                 enableDragDrop={true}
                             />
@@ -182,6 +198,7 @@ export function TasksPage() {
                                 onAdd={handleAddTask}
                                 onToggle={handleToggleTask}
                                 onDelete={handleDeleteTask}
+                                onEdit={handleEditTask}
                                 onReorder={handleReorderWeek}
                                 enableDragDrop={true}
                             />
@@ -200,6 +217,7 @@ export function TasksPage() {
                                 onAdd={handleAddTask}
                                 onToggle={handleToggleTask}
                                 onDelete={handleDeleteTask}
+                                onEdit={handleEditTask}
                                 onReorder={handleReorderBacklog}
                                 enableDragDrop={true}
                             />
@@ -223,6 +241,17 @@ export function TasksPage() {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Edit Task Modal */}
+            <TaskEditModal
+                task={editingTask}
+                isOpen={isEditModalOpen}
+                onClose={() => {
+                    setIsEditModalOpen(false);
+                    setEditingTask(null);
+                }}
+                onSave={handleSaveEdit}
+            />
         </div>
     );
 }
